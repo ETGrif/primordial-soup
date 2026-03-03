@@ -24,7 +24,7 @@ def animate(root, canvas, soup, fps=24):
             canvas.move(p.animation_ref, p.v[0], p.v[1])
             root.update()
         elapsed = time.time() - start
-        # time.sleep(abs(1/fps-elapsed))
+        time.sleep(abs(1/fps-elapsed))
     
 
 if __name__ == "__main__":
