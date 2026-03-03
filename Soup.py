@@ -1,34 +1,45 @@
 import numpy as np
+from Particle import Particle
 
-"""
-A Particle takes in 
-"""
-class Particle:
-    def __init__(self, x, y):
-        self.pos = np.array([x,y])
-        self.v = np.array([0,0]) #just to initialize
-        
-        
-    def move(self):
-        #This function needs to make an update based on the X = n + g + b rules
-        # TODO Right now I just want it to move left
-        self.v = np.random.normal(0, 1, (2,)) #making it a saved value so that it could be animated
-        self.pos += self.v
-        
-        
+
+BIAS = "bias"
+ID = "id"
+
+                
 class Soup:
     
+    pheno_id_count = 0
+    
     # defined width, heighth and number of randomlme generated particles
-    def __init__(self, w, h, n):
+    def __init__(self, w, h, n, class_dist=[1]):
         self.particles = []
-        for _ in range(n):
-            self.particles.append(Particle(np.random.rand()*w, np.random.rand()*h))
+        self.w = w
+        self.h = h
+        self.class_dist = class_dist
+        
+        #create C = n*class_dist agents with a common phenotype
+        for C in class_dist:
+            self.populate(self.create_random_pheno(), int(C*n))
+        
             
     def move_all(self):
         for p in self.particles:
             p.move()
-        
-        
-        
-        
     
+    def populate(self, pheno, n):
+        for _ in range(n):
+            self.particles.append(Particle(np.random.rand()*self.w, np.random.rand()*self.h, self, pheno))
+        
+
+    def create_random_pheno(self):
+            p = dict()
+            
+            #pheno id
+            p[ID] = self.pheno_id_count
+            self.pheno_id_count += 1 #increment!
+            
+            # bias. Unit vector in a uniform direction
+            theta = np.random.rand()*np.pi*2
+            p[BIAS] = np.array([np.sin(theta), np.cos(theta)])
+            
+            return p
