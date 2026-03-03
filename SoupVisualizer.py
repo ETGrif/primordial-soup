@@ -33,7 +33,7 @@ if __name__ == "__main__":
     
     root, canvas = build(w,h)
     
-    soup = Soup.Soup(w, h, 200)
+    soup = Soup.Soup(w, h, 200, complexity=3)
 
     initialize(canvas, soup)
    
