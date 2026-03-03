@@ -21,7 +21,7 @@ def animate(root, canvas, soup, fps=24):
         start = time.time()
         soup.move_all()
         for p in soup.particles:
-            canvas.move(p.animation_ref, p.v[0], p.v[1])
+            canvas.moveto(p.animation_ref, p.pos[0], p.pos[1])
             root.update()
         elapsed = time.time() - start
         time.sleep(abs(1/fps-elapsed))
