@@ -3,18 +3,20 @@ from Particle import Particle
 
 
 BIAS = "bias"
-        
-        
+
+                
 class Soup:
     
     # defined width, heighth and number of randomlme generated particles
-    def __init__(self, w, h, n, complexity):
+    def __init__(self, w, h, n, class_dist=[1]):
         self.particles = []
         self.w = w
         self.h = h
-        self.complexity = complexity
+        self.class_dist = class_dist
         
-        self.populate(create_random_pheno(), n)
+        #create C = n*class_dist agents with a common phenotype
+        for C in class_dist:
+            self.populate(create_random_pheno(), int(C*n))
         
             
     def move_all(self):
@@ -25,7 +27,6 @@ class Soup:
         for _ in range(n):
             self.particles.append(Particle(np.random.rand()*self.w, np.random.rand()*self.h, self, pheno))
         
-
 
 def create_random_pheno():
         p = dict()

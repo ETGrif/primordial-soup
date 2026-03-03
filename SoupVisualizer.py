@@ -24,7 +24,7 @@ def animate(root, canvas, soup, fps=24):
             canvas.moveto(p.animation_ref, p.pos[0], p.pos[1])
             root.update()
         elapsed = time.time() - start
-        time.sleep(abs(1/fps-elapsed))
+        time.sleep(max(1/fps-elapsed, 0))
     
 
 if __name__ == "__main__":
@@ -33,9 +33,11 @@ if __name__ == "__main__":
     
     root, canvas = build(w,h)
     
-    soup = Soup.Soup(w, h, 200, complexity=3)
+    soup = Soup.Soup(w, h, 200, class_dist=[1/3, 1/3, 1/3])
+    print("Soup Initialized")
 
     initialize(canvas, soup)
+    print("Canvas Initialized")
    
     animate(root, canvas, soup)
 
