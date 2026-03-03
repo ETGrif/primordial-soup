@@ -12,9 +12,10 @@ def build(w, h):
     return root, C
 
 def initialize(canvas, soup, r=3):
+    colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
     for p in soup.particles:
         x, y = p.pos[0], p.pos[1]
-        p.animation_ref = canvas.create_oval(x-r, y-r, x+r, y+r, fill="black")   
+        p.animation_ref = canvas.create_oval(x-r, y-r, x+r, y+r, fill=colors[p.phenotype["id"]])   
 
 def animate(root, canvas, soup, fps=24):
     while True:
@@ -33,7 +34,8 @@ if __name__ == "__main__":
     
     root, canvas = build(w,h)
     
-    soup = Soup.Soup(w, h, 200, class_dist=[1/3, 1/3, 1/3])
+    c = 5 #number of classes
+    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)])
     print("Soup Initialized")
 
     initialize(canvas, soup)
