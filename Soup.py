@@ -8,7 +8,7 @@ ID = "id"
                 
 class Soup:
     
-    pheno_id_count = 0
+    phenotypes = []
     
     # defined width, heighth and number of randomlme generated particles
     def __init__(self, w, h, n, class_dist=[1]):
@@ -30,13 +30,14 @@ class Soup:
         for _ in range(n):
             self.particles.append(Particle(np.random.rand()*self.w, np.random.rand()*self.h, self, pheno))
         
+    def new_phenotype(self):
+        phenotype = dict()
+        phenotype[ID] = len(self.phenotypes)
+        self.phenotypes.append(phenotype)
+        return phenotype
 
     def create_random_pheno(self):
-            p = dict()
-            
-            #pheno id
-            p[ID] = self.pheno_id_count
-            self.pheno_id_count += 1 #increment!
+            p = self.new_phenotype()
             
             # bias. Unit vector in a uniform direction
             theta = np.random.rand()*np.pi*2
