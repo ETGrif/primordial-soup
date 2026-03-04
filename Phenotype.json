@@ -1,6 +1,6 @@
 {
     "id": 0,
-    "brownian":{
+    "gaussian":{
         "theta": [0]
     },
     "bias":{

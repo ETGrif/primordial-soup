@@ -17,20 +17,20 @@ class Particle:
         
         # Brownian motion
         t = self.phenotype["gaussian"]["theta"]
-        g_vec = np.random.normal(0, t[0], (2,)) #making it a saved value so that it could be animated
+        g_vec = t[0]*np.random.normal(0, 1, (2,)) #making it a saved value so that it could be animated
         
         # directional bias
         w = self.phenotype["bias"]["weight"]
         t = self.phenotype["bias"]["theta"]
         s, c = np.sin(t[0]), np.cos(t[0])
         R = np.array(
-            [[s, c ],
-             [c, -c]])
+            [[c, -s ],
+             [s, c]])
         b_vec = R@self.v
-        b_vec *= t[0]/np.linalg.norm(b_vec) #rescale!
+        b_vec *= w/np.linalg.norm(b_vec) #rescale! NOTE: this causes a numerical error when v is near parallel to an axis, I dont thinkt its an issue
         
         
-        self.v = g_vec + b_vec
+        self.v = g_vec + b_vec #store it for reference in next step
         self.pos += self.v
         
         #wrap around!
