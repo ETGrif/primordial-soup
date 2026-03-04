@@ -22,7 +22,7 @@ class Soup:
             self.populate(self.create_random_pheno(), int(C*n))
         
             
-    def move_all(self):
+    def sim_step(self):
         for p in self.particles:
             p.move()
     

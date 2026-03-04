@@ -20,7 +20,7 @@ def initialize(canvas, soup, r=3):
 def animate(root, canvas, soup, fps=24):
     while True:
         start = time.time()
-        soup.move_all()
+        soup.sim_step()
         for p in soup.particles:
             canvas.moveto(p.animation_ref, p.pos[0], p.pos[1])
             root.update()
