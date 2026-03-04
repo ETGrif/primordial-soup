@@ -61,7 +61,7 @@ class Soup:
             #directional bias
             p.update(bias= {
                 "weight": weightMax * rand(),
-                "theta": [2*np.pi*rand()]
+                "theta": [np.pi/2 - np.pi*rand()]
             })
             
             

@@ -33,22 +33,22 @@ def animate(root, canvas, soup, fps=24):
 if __name__ == "__main__":
     
     w, h = 400, 400
-    c = 1 #the number of classes
+    c = 3 #the number of classes
     
     root, canvas = build(w,h)
     
     p = {
     "id": 0,
     "gaussian":{
-        "theta": [0]
+        "theta": [.01]
     },
     "bias":{
         "weight": 5,
-        "theta": [15*(np.pi/180)]
+        "theta": [4*(np.pi/180)]
     }
     }
     
-    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=[p])
+    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=None)
     print("Soup Initialized")
 
     initialize(canvas, soup)
