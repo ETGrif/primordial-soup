@@ -9,15 +9,27 @@ class Soup:
     phenotypes = []
     
     # defined width, heighth and number of randomlme generated particles
-    def __init__(self, w, h, n, class_dist=[1]):
+    def __init__(self, w, h, n, class_dist=[1], phenotypes=None):
         self.particles = []
         self.w = w
         self.h = h
         self.class_dist = class_dist
+    
         
-        #create C = n*class_dist agents with a common phenotype
-        for C in class_dist:
-            self.populate(self.create_random_pheno(), int(C*n))
+        #Populate with class_dist. If presesnt, use premade phenotypes, othewise generate randomly.
+        
+        assert np.isclose(sum(class_dist), 1), "Invalid Class Dist."
+        if phenotypes != None: assert len(phenotypes) == len(class_dist), "Different number of phenotypes than classes."
+        
+        for i, C in enumerate(class_dist):
+            if phenotypes==None:
+                # premade not present, generate new random phenotype
+                self.populate(self.create_random_pheno(), int(C*n))
+            else:
+                # use the premade phenotypes
+                p = self.new_phenotype()
+                p.update(phenotypes[i])
+                self.populate(p, int(C*n))
         
             
     def sim_step(self):

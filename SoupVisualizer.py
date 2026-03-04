@@ -1,8 +1,10 @@
 # Creates a visual representation of a soup
 
 import tkinter as tk
+import numpy as np
 import time
 import Soup
+
 
 def build(w, h):
     root = tk.Tk()
@@ -31,11 +33,22 @@ def animate(root, canvas, soup, fps=24):
 if __name__ == "__main__":
     
     w, h = 400, 400
-    c = 3 #the number of classes
+    c = 1 #the number of classes
     
     root, canvas = build(w,h)
     
-    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)])
+    p = {
+    "id": 0,
+    "gaussian":{
+        "theta": [0]
+    },
+    "bias":{
+        "weight": 5,
+        "theta": [15*(np.pi/180)]
+    }
+    }
+    
+    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=[p])
     print("Soup Initialized")
 
     initialize(canvas, soup)
