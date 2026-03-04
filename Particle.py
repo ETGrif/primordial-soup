@@ -6,7 +6,7 @@ A Particle takes in
 class Particle:
     def __init__(self, x, y, soup, phenotype):
         self.pos = np.array([x,y])
-        self.v = np.array([0,0]) #just to initialize
+        self.v = np.array([1,0]) #just to initialize. NOT ZERO for inverse norm reasons
         
         self.soup = soup
         self.phenotype = phenotype
@@ -14,8 +14,23 @@ class Particle:
         
     def move(self):
         #This function needs to make an update based on the X = n + g + b rules
-        self.v = np.random.normal(0, 1, (2,)) #making it a saved value so that it could be animated
-        self.v += self.phenotype["bias"]
+        
+        # Brownian motion
+        t = self.phenotype["gaussian"]["theta"]
+        g_vec = np.random.normal(0, t[0], (2,)) #making it a saved value so that it could be animated
+        
+        # directional bias
+        w = self.phenotype["bias"]["weight"]
+        t = self.phenotype["bias"]["theta"]
+        s, c = np.sin(t[0]), np.cos(t[0])
+        R = np.array(
+            [[s, c ],
+             [c, -c]])
+        b_vec = R@self.v
+        b_vec *= t[0]/np.linalg.norm(b_vec) #rescale!
+        
+        
+        self.v = g_vec + b_vec
         self.pos += self.v
         
         #wrap around!

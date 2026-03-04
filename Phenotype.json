@@ -1,0 +1,11 @@
+{
+    "id": 0,
+    "brownian":{
+        "theta": [0]
+    },
+    "bias":{
+        "weight": 0,
+        "theta": [0]
+    }
+
+}

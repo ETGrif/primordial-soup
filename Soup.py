@@ -1,9 +1,7 @@
 import numpy as np
+from numpy.random import rand
 from Particle import Particle
 
-
-BIAS = "bias"
-ID = "id"
 
                 
 class Soup:
@@ -32,15 +30,27 @@ class Soup:
         
     def new_phenotype(self):
         phenotype = dict()
-        phenotype[ID] = len(self.phenotypes)
+        phenotype["id"] = len(self.phenotypes)
         self.phenotypes.append(phenotype)
         return phenotype
 
     def create_random_pheno(self):
             p = self.new_phenotype()
+            weightMax = 5
             
-            # bias. Unit vector in a uniform direction
-            theta = np.random.rand()*np.pi*2
-            p[BIAS] = np.array([np.sin(theta), np.cos(theta)])
+            
+            #Brownian
+            # [sigma]
+            sigmaRange = (1,5)
+            p.update(gaussian = {
+                    "theta": [sigmaRange[0] + (sigmaRange[1]-sigmaRange[0])*rand()]
+                }) 
+            
+            #directional bias
+            p.update(bias= {
+                "weight": weightMax * rand(),
+                "theta": [2*np.pi*rand()]
+            })
+            
             
             return p
