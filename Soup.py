@@ -44,16 +44,19 @@ class Soup:
         
     # for optimizing the neighborhood search
     def update_q_tree(self):
-        self.qt = pyqt.Index(bbox=(0,0,self.w, self.h))
+        self.qts = [pyqt.Index(bbox=(0,0,self.w, self.h)) for _ in range(len(self.class_dist))] #create a qTree for each class
         for p in self.particles:
-            self.qt.insert(p, (p.pos[0], p.pos[1], p.pos[0]+1, p.pos[1]+1))
+            ci = p.phenotype["id"]
+            self.qts[ci].insert(p, (p.pos[0], p.pos[1], p.pos[0]+1, p.pos[1]+1))
         
     # returns the total number of neighbors within radius R of pos, and an array of arrays,
     # each array is the list of particles of a single class.
     def get_neighbors(self, pos, R):
-        overlap = (pos[0]-R, pos[1]-R, pos[0]+R, pos[1]+R)
-        neighbors = self.qt.intersect(overlap)
-        return len(neighbors), [neighbors]   #for now assumes there is only one class   
+        # TODO account for the wrap around of space!
+        overlap = (pos[0]-R, pos[1]-R, pos[0]+R, pos[1]+R) #define search space
+        neighbors = [qt.intersect(overlap) for qt in self.qts] #find the neighbors of the class
+        count = sum([len(x) for x in neighbors]) #find total number of neighbors found
+        return count, neighbors   
 
     def new_phenotype(self):
         phenotype = dict()
@@ -64,7 +67,10 @@ class Soup:
     def create_random_pheno(self):
             p = self.new_phenotype()
             weightMax = 5
-            nuclearRmax=10
+            strongNuclearRmax=5
+            weakNuclearDmax=10
+            
+            
             
             
             #Brownian
@@ -80,9 +86,23 @@ class Soup:
                 "theta": [np.pi/2 - np.pi*rand()]
             })
             
-            # Neuclear Force
-            p.update(nuclear={
-                "theta": [nuclearRmax * rand()]
+            # Strong Nuclear Force
+            p.update(strong_nuclear={
+                "theta": [strongNuclearRmax * rand()]
+            })
+            
+            # Weak Nuclear Force
+            # the weak nuclear foce is discriminatory, so there is a phenotype for
+            # every class
+            t = []
+            for _ in range(len(self.class_dist)):
+                r = weakNuclearDmax*rand() #this is the distance of impact
+                d1 = r*rand() # deccay range width
+                d2 = r-d1 # growth range width
+                A = 2*weightMax*rand() - weightMax #amplitude of effect
+                t.append([d1, d2, A])
+            p.update(weak_nuclear={
+                "theta": t
             })
             
             

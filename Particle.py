@@ -36,21 +36,38 @@ class Particle:
         
         
         
-        #Strong Nuclear Force
-        R = self.phenotype["nuclear"]["theta"][0]
-        s_vec = np.array([0.0,0.0])
-        for particle_class in neighbors:
+        # Nuclear forces (both Strong and Weak) (Discriminatory)
+        R = self.phenotype["strong_nuclear"]["theta"][0]
+        n_vec = np.array([0.0,0.0])
+        for ci, particle_class in enumerate(neighbors):
+            d1, d2, A = self.phenotype["weak_nuclear"]["theta"][ci]
             for p in particle_class:
                 r = p.pos - self.pos
                 mag = np.linalg.norm(r)
-                if mag <= R and mag > 1e-10:
-                    f = (mag-R)**2/mag # find the strong force
-                    s_vec += f*r/mag  # apply the force with mag f in the direction of r
-        s_vec /= n_neighbors #we want the average force        
                 
+                if mag <= 1e-14: continue #to prevent div by zero
+                #Strong Nuclear Force
+                elif mag <= R:
+                    f = -(mag-R)**2/mag # find the strong force
+                    
+                # weak nuclear Force
+                elif mag <= R + d1: #close (decay)
+                    f = A/d1*(mag - R)
+                elif mag <= R + d1 + d2: #far (growth)
+                    f = A/d2 * (R + d1 + d2 - mag)
+                # default force
+                else:
+                    f = 0 
+                    n_neighbors -= 1 #if the particle was out of range, dont include in the avg
+                
+                #apply the force
+                n_vec += f*r/mag  # in direction of r
+        n_vec /= n_neighbors #we want the average force        
+        
+        
                 
         
-        self.v = g_vec + b_vec + s_vec#store it for reference in next step
+        self.v = g_vec + b_vec + n_vec #store it for reference in next step
         self.pos += self.v
         
         #wrap around!
