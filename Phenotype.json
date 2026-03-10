@@ -6,6 +6,9 @@
     "bias":{
         "weight": 0,
         "theta": [0]
+    },
+    "nuclear":{
+        "theta": [0]
     }
 
 }

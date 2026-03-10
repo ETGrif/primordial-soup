@@ -30,6 +30,26 @@ class Particle:
         b_vec *= w/np.linalg.norm(b_vec) #rescale! NOTE: this causes a numerical error when v is near parallel to an axis, I dont thinkt its an issue
         
         
+        #Grab those neighbors!
+        reactiveRadius = 20
+        n_neighbors, neighbors = self.soup.get_neighbors(self.pos, reactiveRadius)
+        
+        
+        
+        #Strong Nuclear Force
+        R = self.phenotype["nuclear"]["theta"][0]
+        s_vec = np.array([0.0,0.0])
+        for particle_class in neighbors:
+            for p in particle_class:
+                r = p.pos - self.pos
+                mag = np.linalg.norm(r)
+                if mag <= R:
+                    f = (mag-R)**2/mag # find the strong force
+                    s_vec += f*r/mag  # apply the force with mag f in the direction of r
+                    
+                
+                
+        
         self.v = g_vec + b_vec #store it for reference in next step
         self.pos += self.v
         

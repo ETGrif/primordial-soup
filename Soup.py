@@ -31,7 +31,6 @@ class Soup:
                 p.update(phenotypes[i])
                 self.populate(p, int(C*n))
         
-            
     def sim_step(self):
         for p in self.particles:
             p.move()
@@ -40,6 +39,13 @@ class Soup:
         for _ in range(n):
             self.particles.append(Particle(np.random.rand()*self.w, np.random.rand()*self.h, self, pheno))
         
+    # returns the total number of neighbors within radius R of pos, and an array of arrays,
+    # each array is the list of particles of a single class.
+    def get_neighbors(self, pos, R):
+        # TODO This returns a dummy set!
+        # print("TODO implement get_neighbors")
+        return len(self.particles), [self.particles]   #for now assumes there is only one class   
+
     def new_phenotype(self):
         phenotype = dict()
         phenotype["id"] = len(self.phenotypes)
@@ -49,6 +55,7 @@ class Soup:
     def create_random_pheno(self):
             p = self.new_phenotype()
             weightMax = 5
+            nuclearRmax=10
             
             
             #Brownian
@@ -62,6 +69,11 @@ class Soup:
             p.update(bias= {
                 "weight": weightMax * rand(),
                 "theta": [np.pi/2 - np.pi*rand()]
+            })
+            
+            # Neuclear Force
+            p.update(nuclear={
+                "theta": [nuclearRmax * rand()]
             })
             
             
