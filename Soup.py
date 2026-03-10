@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.random import rand
 from Particle import Particle
+import pyqtree as pyqt
 
 
                 
@@ -32,6 +33,8 @@ class Soup:
                 self.populate(p, int(C*n))
         
     def sim_step(self):
+        self.update_q_tree()
+        
         for p in self.particles:
             p.move()
     
@@ -39,12 +42,18 @@ class Soup:
         for _ in range(n):
             self.particles.append(Particle(np.random.rand()*self.w, np.random.rand()*self.h, self, pheno))
         
+    # for optimizing the neighborhood search
+    def update_q_tree(self):
+        self.qt = pyqt.Index(bbox=(0,0,self.w, self.h))
+        for p in self.particles:
+            self.qt.insert(p, (p.pos[0], p.pos[1], p.pos[0]+1, p.pos[1]+1))
+        
     # returns the total number of neighbors within radius R of pos, and an array of arrays,
     # each array is the list of particles of a single class.
     def get_neighbors(self, pos, R):
-        # TODO This returns a dummy set!
-        # print("TODO implement get_neighbors")
-        return len(self.particles), [self.particles]   #for now assumes there is only one class   
+        overlap = (pos[0]-R, pos[1]-R, pos[0]+R, pos[1]+R)
+        neighbors = self.qt.intersect(overlap)
+        return len(neighbors), [neighbors]   #for now assumes there is only one class   
 
     def new_phenotype(self):
         phenotype = dict()

@@ -43,14 +43,14 @@ class Particle:
             for p in particle_class:
                 r = p.pos - self.pos
                 mag = np.linalg.norm(r)
-                if mag <= R:
+                if mag <= R and mag > 1e-10:
                     f = (mag-R)**2/mag # find the strong force
                     s_vec += f*r/mag  # apply the force with mag f in the direction of r
-                    
+        s_vec /= n_neighbors #we want the average force        
                 
                 
         
-        self.v = g_vec + b_vec #store it for reference in next step
+        self.v = g_vec + b_vec + s_vec#store it for reference in next step
         self.pos += self.v
         
         #wrap around!
