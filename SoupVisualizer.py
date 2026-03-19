@@ -17,7 +17,8 @@ def initialize(canvas, soup, r=3, trails=False):
     colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
     for p in soup.particles:
         x, y, cid = p.pos[0], p.pos[1], p.phenotype["id"]
-        p.animation_ref = canvas.create_oval(x-r, y-r, x+r, y+r, fill=colors[cid])
+        p.r = p.phenotype["strong_nuclear"]["theta"][0]
+        p.animation_ref = canvas.create_oval(x-p.r, y-p.r, x+p.r, y+p.r, fill=colors[cid])
         
         # trails
         if trails:
@@ -30,7 +31,7 @@ def animate(root, canvas, soup, fps=24, trail_length=None):
         soup.sim_step()
         for p in soup.particles:
             # particle position
-            canvas.moveto(p.animation_ref, p.pos[0], p.pos[1])
+            canvas.moveto(p.animation_ref, p.pos[0]-p.r, p.pos[1]-p.r)
             
             # trails
             if trail_length:
@@ -65,7 +66,7 @@ if __name__ == "__main__":
         "theta": [0]
     },
     "strong_nuclear":{
-        "theta": [5]
+        "theta": [3]
     },
     "weak_nuclear":{
         "theta": [[3,3,2],[3,3,-6]]
