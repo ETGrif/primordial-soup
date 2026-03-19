@@ -1,0 +1,17 @@
+{
+    "id": 0,
+    "gaussian":{
+        "theta": [0]
+    },
+    "bias":{
+        "weight": 0,
+        "theta": [0]
+    },
+    "strong_nuclear":{
+        "theta": [0]
+    },
+    "weak_nuclear":{
+        "theta": [[0,0,0]]
+    }
+
+}

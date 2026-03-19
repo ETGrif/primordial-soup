@@ -1,8 +1,10 @@
 # Creates a visual representation of a soup
 
 import tkinter as tk
+import numpy as np
 import time
 import Soup
+
 
 def build(w, h):
     root = tk.Tk()
@@ -20,7 +22,7 @@ def initialize(canvas, soup, r=3):
 def animate(root, canvas, soup, fps=24):
     while True:
         start = time.time()
-        soup.move_all()
+        soup.sim_step()
         for p in soup.particles:
             canvas.moveto(p.animation_ref, p.pos[0], p.pos[1])
             root.update()
@@ -31,16 +33,48 @@ def animate(root, canvas, soup, fps=24):
 if __name__ == "__main__":
     
     w, h = 400, 400
-    c = 3 #the number of classes
+    c = 2 #the number of classes
     
     root, canvas = build(w,h)
     
-    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)])
+    p1 = {
+    "gaussian":{
+        "theta": [0.05]
+    },
+    "bias":{
+        "weight": 0,
+        "theta": [0]
+    },
+    "strong_nuclear":{
+        "theta": [5]
+    },
+    "weak_nuclear":{
+        "theta": [[3,3,2],[3,3,-6]]
+    }
+    }
+    
+    p2 = {
+    "gaussian":{
+        "theta": [0.05]
+    },
+    "bias":{
+        "weight": 0,
+        "theta": [0]
+    },
+    "strong_nuclear":{
+        "theta": [5]
+    },
+    "weak_nuclear":{
+        "theta": [[3,8,5], [3,3,2]]
+    }}
+
+    
+    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=[p1, p2])
     print("Soup Initialized")
 
     initialize(canvas, soup)
     print("Canvas Initialized")
    
-    animate(root, canvas, soup)
+    animate(root, canvas, soup, fps=24)
 
     
