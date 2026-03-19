@@ -42,7 +42,7 @@ class Particle:
         for ci, particle_class in enumerate(neighbors):
             d1, d2, A = self.phenotype["weak_nuclear"]["theta"][ci]
             for p in particle_class:
-                r = p.pos - self.pos
+                r = p - self.pos
                 mag = np.linalg.norm(r)
                 
                 if mag <= 1e-14: continue #to prevent div by zero

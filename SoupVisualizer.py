@@ -33,7 +33,7 @@ def animate(root, canvas, soup, fps=24):
 if __name__ == "__main__":
     
     w, h = 400, 400
-    c = 2 #the number of classes
+    c = 4 #the number of classes
     
     root, canvas = build(w,h)
     
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     }}
 
     
-    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=[p1, p2])
+    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=None)
     print("Soup Initialized")
 
     initialize(canvas, soup)

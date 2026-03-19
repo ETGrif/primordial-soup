@@ -15,6 +15,7 @@ class Soup:
         self.w = w
         self.h = h
         self.class_dist = class_dist
+        self.max_perception_distance = max(w/4, h/4) # TODO this should be dynamic, but for now static
     
         
         #Populate with class_dist. If presesnt, use premade phenotypes, othewise generate randomly.
@@ -47,7 +48,7 @@ class Soup:
         self.qts = [pyqt.Index(bbox=(0,0,self.w, self.h)) for _ in range(len(self.class_dist))] #create a qTree for each class
         for p in self.particles:
             ci = p.phenotype["id"]
-            self.qts[ci].insert(p, (p.pos[0], p.pos[1], p.pos[0]+1, p.pos[1]+1))
+            self.qts[ci].insert(p.pos, (p.pos[0]-1, p.pos[1]-1, p.pos[0]+1, p.pos[1]+1))
         
     # returns the total number of neighbors within radius R of pos, and an array of arrays,
     # each array is the list of particles of a single class.
