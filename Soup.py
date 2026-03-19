@@ -45,10 +45,16 @@ class Soup:
         
     # for optimizing the neighborhood search
     def update_q_tree(self):
-        self.qts = [pyqt.Index(bbox=(0,0,self.w, self.h)) for _ in range(len(self.class_dist))] #create a qTree for each class
+        w, h = self.w, self.h
+        q_tree_offsets = [np.array(b) for b in [[-w,-h], [-w, 0], [-w, h], [0, -h], [0, 0], [0, h], [w, -h], [w,0], [w,h]]]
+        mpd = self.max_perception_distance
+        self.qts = [pyqt.Index(bbox=(-mpd,-mpd,self.w+mpd, self.h+mpd)) for _ in range(len(self.class_dist))] #create a qTree for each class
         for p in self.particles:
             ci = p.phenotype["id"]
-            self.qts[ci].insert(p.pos, (p.pos[0]-1, p.pos[1]-1, p.pos[0]+1, p.pos[1]+1))
+            for b in q_tree_offsets:
+                pos = p.pos+b
+                self.qts[ci].insert(pos, (pos[0]-1, pos[1]-1, pos[0]+1, pos[1]+1))
+            #include ghosts!
         
     # returns the total number of neighbors within radius R of pos, and an array of arrays,
     # each array is the list of particles of a single class.

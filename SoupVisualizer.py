@@ -33,7 +33,7 @@ def animate(root, canvas, soup, fps=24):
 if __name__ == "__main__":
     
     w, h = 400, 400
-    c = 4 #the number of classes
+    c = 2 #the number of classes
     
     root, canvas = build(w,h)
     
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         "theta": [5]
     },
     "weak_nuclear":{
-        "theta": [[3,3,1],[3,3,-6]]
+        "theta": [[3,3,2],[3,3,-6]]
     }
     }
     
@@ -65,11 +65,11 @@ if __name__ == "__main__":
         "theta": [5]
     },
     "weak_nuclear":{
-        "theta": [[3,8,5], [3,3,1]]
+        "theta": [[3,8,5], [3,3,2]]
     }}
 
     
-    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=None)
+    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=[p1, p2])
     print("Soup Initialized")
 
     initialize(canvas, soup)
