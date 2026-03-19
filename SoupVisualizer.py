@@ -13,18 +13,32 @@ def build(w, h):
     C.pack()
     return root, C
 
-def initialize(canvas, soup, r=3):
+def initialize(canvas, soup, r=3, trail_length=None):
     colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
     for p in soup.particles:
-        x, y = p.pos[0], p.pos[1]
-        p.animation_ref = canvas.create_oval(x-r, y-r, x+r, y+r, fill=colors[p.phenotype["id"]])   
-
-def animate(root, canvas, soup, fps=24):
+        x, y, cid = p.pos[0], p.pos[1], p.phenotype["id"]
+        p.animation_ref = canvas.create_oval(x-r, y-r, x+r, y+r, fill=colors[cid])
+        
+        # trails
+        if trail_length != None:
+            p.history=[x, y]*trail_length
+            p.trail_ref = canvas.create_line(p.history, fill=colors[cid])
+        
+def animate(root, canvas, soup, fps=24, trails=False):
     while True:
         start = time.time()
         soup.sim_step()
         for p in soup.particles:
+            # particle position
             canvas.moveto(p.animation_ref, p.pos[0], p.pos[1])
+            
+            # trails
+            if trails:
+                p.history.pop(0) #remove old coords
+                p.history.pop(0)
+                p.history.extend(p.pos) #add on new coords
+                canvas.coords(p.trail_ref, p.history)
+            
             root.update()
         elapsed = time.time() - start
         time.sleep(max(1/fps-elapsed, 0))
@@ -72,9 +86,9 @@ if __name__ == "__main__":
     soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=[p1, p2])
     print("Soup Initialized")
 
-    initialize(canvas, soup)
+    initialize(canvas, soup, trail_length=15)
     print("Canvas Initialized")
    
-    animate(root, canvas, soup, fps=24)
+    animate(root, canvas, soup, fps=24, trails=True)
 
     
