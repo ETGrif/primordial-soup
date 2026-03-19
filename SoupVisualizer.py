@@ -13,18 +13,18 @@ def build(w, h):
     C.pack()
     return root, C
 
-def initialize(canvas, soup, r=3, trail_length=None):
+def initialize(canvas, soup, r=3, trails=False):
     colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
     for p in soup.particles:
         x, y, cid = p.pos[0], p.pos[1], p.phenotype["id"]
         p.animation_ref = canvas.create_oval(x-r, y-r, x+r, y+r, fill=colors[cid])
         
         # trails
-        if trail_length != None:
-            p.history=[x, y]*trail_length
+        if trails:
+            p.history=[x, y]*2
             p.trail_ref = canvas.create_line(p.history, fill=colors[cid])
         
-def animate(root, canvas, soup, fps=24, trails=False):
+def animate(root, canvas, soup, fps=24, trail_length=None):
     while True:
         start = time.time()
         soup.sim_step()
@@ -33,11 +33,16 @@ def animate(root, canvas, soup, fps=24, trails=False):
             canvas.moveto(p.animation_ref, p.pos[0], p.pos[1])
             
             # trails
-            if trails:
-                p.history.pop(0) #remove old coords
-                p.history.pop(0)
+            if trail_length:
+                if p.wrapped_this_frame:
+                    p.history = [p.pos[0], p.pos[1]]
                 p.history.extend(p.pos) #add on new coords
                 canvas.coords(p.trail_ref, p.history)
+                
+                #purge the end of the trail
+                if len(p.history) >trail_length:
+                    p.history.pop(0) #remove old coords
+                    p.history.pop(0)
             
             root.update()
         elapsed = time.time() - start
@@ -86,9 +91,9 @@ if __name__ == "__main__":
     soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=[p1, p2])
     print("Soup Initialized")
 
-    initialize(canvas, soup, trail_length=15)
+    initialize(canvas, soup, trails=True)
     print("Canvas Initialized")
    
-    animate(root, canvas, soup, fps=24, trails=True)
+    animate(root, canvas, soup, fps=24, trail_length=30)
 
     
