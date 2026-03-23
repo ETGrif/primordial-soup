@@ -51,7 +51,7 @@ class Particle:
                 if mag <= 1e-14: continue #to prevent div by zero
                 #Strong Nuclear Force
                 elif mag <= R:
-                    f = -(mag-R)**2/mag # find the strong force
+                    f = -5*(mag-R)**2/mag # find the strong force
                     
                 # weak nuclear Force
                 elif mag <= R + d1: #close (decay)

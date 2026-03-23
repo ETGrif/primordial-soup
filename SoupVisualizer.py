@@ -48,53 +48,5 @@ def animate(root, canvas, soup, fps=24, trail_length=None):
             root.update()
         elapsed = time.time() - start
         time.sleep(max(1/fps-elapsed, 0))
-    
-
-if __name__ == "__main__":
-    
-    w, h = 400, 400
-    c = 2 #the number of classes
-    
-    root, canvas = build(w,h)
-    
-    p1 = {
-    "gaussian":{
-        "theta": [0.05]
-    },
-    "bias":{
-        "weight": 0,
-        "theta": [0]
-    },
-    "strong_nuclear":{
-        "theta": [3]
-    },
-    "weak_nuclear":{
-        "theta": [[3,3,2],[3,3,-6]]
-    }
-    }
-    
-    p2 = {
-    "gaussian":{
-        "theta": [0.05]
-    },
-    "bias":{
-        "weight": 0,
-        "theta": [0]
-    },
-    "strong_nuclear":{
-        "theta": [5]
-    },
-    "weak_nuclear":{
-        "theta": [[3,8,5], [3,3,2]]
-    }}
-
-    
-    soup = Soup.Soup(w, h, 200, class_dist=[1/c for _ in range(c)], phenotypes=[p1, p2])
-    print("Soup Initialized")
-
-    initialize(canvas, soup, trails=True)
-    print("Canvas Initialized")
-   
-    animate(root, canvas, soup, fps=24, trail_length=30)
 
     
