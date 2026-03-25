@@ -12,8 +12,11 @@ class Particle:
         self.phenotype = phenotype
         
         
+        
     def move(self):
         #This function needs to make an update based on the X = n + g + b rules
+        
+        self.wrapped_this_frame = False
         
         # Brownian motion
         t = self.phenotype["gaussian"]["theta"]
@@ -48,7 +51,7 @@ class Particle:
                 if mag <= 1e-14: continue #to prevent div by zero
                 #Strong Nuclear Force
                 elif mag <= R:
-                    f = -(mag-R)**2/mag # find the strong force
+                    f = -5*(mag-R)**2/mag # find the strong force
                     
                 # weak nuclear Force
                 elif mag <= R + d1: #close (decay)
@@ -76,9 +79,18 @@ class Particle:
         x = self.pos[0]
         y = self.pos[1]
         
-        if x < 0: x += w
-        if y < 0: y += h
-        if x >= w: x-= w
-        if y >= h: y-= h
+        # im updating the wrapped this frame tag for 
+        if x < 0: 
+            x += w
+            self.wrapped_this_frame = True
+        if y < 0: 
+            y += h
+            self.wrapped_this_frame = True
+        if x >= w: 
+            x-= w
+            self.wrapped_this_frame = True
+        if y >= h: 
+            y-= h
+            self.wrapped_this_frame = True
         self.pos = np.array([x,y])
         
