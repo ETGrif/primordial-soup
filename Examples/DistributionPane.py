@@ -44,14 +44,14 @@ p2 = {
 }}
 
 
-N = 16
+N = 32
 
 soup = Soup.Soup(w, h, 200, class_dist=[.5, .5], phenotypes=[p1,p2])
 
 root.grid(1, 2, w, h)
 canvas.grid(row=0, column=0)
 
-C = stat.build(root, w, h, num_bins=N)
+C = stat.build(root, w/2, h, num_bins=N)
 C.grid(row=0, column=1)
 
 sv.initialize(canvas, soup, trails=True)
