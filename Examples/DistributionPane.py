@@ -7,6 +7,7 @@ import SoupVisualizer as sv
 import StatsVisualizer as stat
 import Soup
 import tkinter as tk
+import numpy as np
 
 w, h = 400, 400
 
@@ -43,18 +44,20 @@ p2 = {
 }}
 
 
-
+N = 16
 
 soup = Soup.Soup(w, h, 200, class_dist=[.5, .5], phenotypes=[p1,p2])
 
 root.grid(1, 2, w, h)
 canvas.grid(row=0, column=0)
 
-C = stat.build(root, w, h)
+C = stat.build(root, w, h, num_bins=N)
 C.grid(row=0, column=1)
 
 sv.initialize(canvas, soup, trails=True)
 
-
+hist = np.ones(N) + np.sin(np.linspace(0, np.pi, N))*.5
+hist /= sum(hist)
+stat.update_histogram(C, hist)
 
 sv.animate(root, canvas, soup, fps=24, trail_length=30)
