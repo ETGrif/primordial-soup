@@ -22,8 +22,7 @@ def initialize(canvas, soup, r=3, trails=False):
         
         # trails
         if trails:
-            p.history=[x, y]*2
-            p.trail_ref = canvas.create_line(p.history, fill=colors[cid])
+            p.trail_ref = canvas.create_line(list(p.history), fill=colors[cid])
         
 def animate(root, canvas, soup, fps=24, trail_length=None):
     while True:
@@ -35,15 +34,15 @@ def animate(root, canvas, soup, fps=24, trail_length=None):
             
             # trails
             if trail_length:
-                if p.wrapped_this_frame:
-                    p.history = [p.pos[0], p.pos[1]]
-                p.history.extend(p.pos) #add on new coords
-                canvas.coords(p.trail_ref, p.history)
+                # if p.wrapped_this_frame:
+                #     p.history = [p.pos[0], p.pos[1]]
+                # p.history.extend(p.pos) #add on new coords
+                canvas.coords(p.trail_ref, list(p.history))
                 
                 #purge the end of the trail
-                if len(p.history) >trail_length:
-                    p.history.pop(0) #remove old coords
-                    p.history.pop(0)
+                # if len(p.history) >trail_length:
+                #     p.history.pop(0) #remove old coords
+                #     p.history.pop(0)
             
             root.update()
         elapsed = time.time() - start
