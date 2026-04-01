@@ -45,5 +45,6 @@ def update_histogram(canvas, hist):
     
     # update the uniform dist reference
     uniform_id = data["uniform"]
-    r= R/(m*len(hist))
+    # r= m/(R*len(hist))
+    r= R**2/(m*len(hist))
     canvas.coords(uniform_id, c[0]-r, c[1]-r, c[0]+r, c[1]+r)

@@ -114,3 +114,22 @@ class Soup:
             
             
             return p
+        
+# -=-=-=-=-=-=-
+# STATS SECTION
+# -=-=-=-=-=-=-
+
+    # returns the direction of movement from each particle, n_bins is the number of bins to return
+    def get_directions(self, n_bins):
+        thetas = np.zeros(n_bins)
+        dt = 2*np.pi / n_bins
+        for p in self.particles:
+            #the indecies are reversed because its a queue
+            dx = p.pos[0] - p.history[0]
+            dy = p.pos[1] - p.history[1]
+            theta = np.arctan2(dy, dx) #find the angle
+            thetas[int(theta/dt)] += 1  #increment the bin its in
+        return thetas
+            
+            
+            

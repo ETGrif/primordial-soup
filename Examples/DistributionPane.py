@@ -44,9 +44,10 @@ p2 = {
 }}
 
 
-N = 32
+N = 12
 
-soup = Soup.Soup(w, h, 200, class_dist=[.5, .5], phenotypes=[p1,p2])
+# soup = Soup.Soup(w, h, 200, class_dist=[.5, .5], phenotypes=[p1,p2])
+soup = Soup.Soup(w, h, 200, class_dist=[.5, .5])
 
 root.grid(1, 2, w, h)
 canvas.grid(row=0, column=0)
@@ -56,8 +57,4 @@ C.grid(row=0, column=1)
 
 sv.initialize(canvas, soup, trails=True)
 
-hist = np.ones(N) + np.sin(np.linspace(0, np.pi, N))*.5
-hist /= sum(hist)
-stat.update_histogram(C, hist)
-
-sv.animate(root, canvas, soup, fps=24, trail_length=30)
+sv.animate(root, canvas, soup, fps=24, trail_length=30, stat_pane=C)
