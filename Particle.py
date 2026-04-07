@@ -7,7 +7,8 @@ A Particle takes in
 class Particle:
     def __init__(self, x, y, soup, phenotype, history_len=15):
         self.pos = np.array([x,y])
-        self.v = np.array([1,0]) #just to initialize. NOT ZERO for inverse norm reasons
+        self.v = np.random.rand(2) #just to initialize. NOT ZERO for inverse norm reasons
+        self.v = self.v / np.linalg.norm(self.v)
         
         self.soup = soup
         self.phenotype = phenotype

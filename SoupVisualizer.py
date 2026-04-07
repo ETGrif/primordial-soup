@@ -46,7 +46,9 @@ def animate(root, canvas, soup, fps=24, trail_length=None, stat_pane=None, stat_
                 canvas.coords(p.trail_ref, list(p.history))
             
         if  stat_pane is not None and frame%update_stat == 0:
-            sv.update_histogram(stat_pane, soup.get_directions(n_bins))
+            hist, raw = soup.get_directions(n_bins, lag=14)
+            p = soup.kuipers_test(raw)
+            sv.update_histogram(stat_pane, hist, p)
         
         root.update()
         elapsed = time.time() - start

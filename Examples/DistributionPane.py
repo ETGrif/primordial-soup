@@ -46,8 +46,8 @@ p2 = {
 
 N = 12
 
-# soup = Soup.Soup(w, h, 200, class_dist=[.5, .5], phenotypes=[p1,p2])
-soup = Soup.Soup(w, h, 200, class_dist=[.5, .5])
+soup = Soup.Soup(w, h, 200, class_dist=[.5, .5], phenotypes=[p1,p2])
+# soup = Soup.Soup(w, h, 200, class_dist=[.5, .5])
 
 root.grid(1, 2, w, h)
 canvas.grid(row=0, column=0)

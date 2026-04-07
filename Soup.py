@@ -2,6 +2,7 @@ import numpy as np
 from numpy.random import rand
 from Particle import Particle
 import pyqtree as pyqt
+from astropy.stats import kuiper
 
 
                 
@@ -120,17 +121,27 @@ class Soup:
 # -=-=-=-=-=-=-
 
     # returns the direction of movement from each particle, n_bins is the number of bins to return
-    def get_directions(self, n_bins):
-        thetas = np.zeros(n_bins)
+    def get_directions(self, n_bins, lag=0):
+        binned_thetas = np.zeros(n_bins)
+        raw_thetas=[]
         dt = 2*np.pi / n_bins
         for p in self.particles:
             if p.wrapped_this_frame: continue
+            if len(p.history) < 2*lag +1: 
+                continue
             
-            dx = p.pos[0] - p.history[0]
-            dy = p.pos[1] - p.history[1]
+            dx = p.pos[0] - p.history[2*lag]
+            dy = p.pos[1] - p.history[2*lag +1]
             theta = np.arctan2(dy, dx) #find the angle
-            thetas[round(theta/dt)] += 1  #increment the bin its in
-        return thetas
+            raw_thetas.append(theta) #record raw theta
+            binned_thetas[round(theta/dt)] += 1  #increment the bin its in
+        return binned_thetas, raw_thetas
+    
+    
+    def kuipers_test(self, raw):
+        raw =np.array(raw)/(2*np.pi) + .5 #astropy kuiper's requires data in [0,1]
+        _, p_val = kuiper(raw)
+        return p_val
             
             
             
