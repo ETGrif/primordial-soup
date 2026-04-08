@@ -8,7 +8,7 @@ from astropy.stats import kuiper
                 
 class Soup:
     
-    phenotypes = []
+    
     
     # defined width, heighth and number of randomlme generated particles
     def __init__(self, w, h, n, class_dist=[1], phenotypes=None):
@@ -17,7 +17,7 @@ class Soup:
         self.h = h
         self.class_dist = class_dist
         self.max_perception_distance = max(w/4, h/4) # TODO this should be dynamic, but for now static
-    
+        self.phenotypes = []
         
         #Populate with class_dist. If presesnt, use premade phenotypes, othewise generate randomly.
         
