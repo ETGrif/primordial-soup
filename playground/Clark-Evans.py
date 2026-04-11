@@ -3,6 +3,7 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 import Soup
+import ClarkEvansUtil as ce
 
 import numpy as np
 import scipy as sp
@@ -33,7 +34,7 @@ def single_experiment():
     return sum(dists)/len(dists)
 
 
-N = 250
+N = 1000
 dists = [single_experiment() for _ in range(N)]
 mu = sum(dists)/N
 sig = np.var(dists)
@@ -44,19 +45,21 @@ fig = go.Figure()
 fig.add_histogram(x=dists, histnorm='probability density', name="E(r) dist")
 fig.update_layout(title={"text":"Histogram"})
 xref = np.linspace(min(dists), max(dists), 100)
-yref = sp.stats.norm.pdf(xref, mu, sig)
+yref = sp.stats.norm.pdf(xref, mu, np.sqrt(sig))
 fig.add_scatter(x=xref, y=yref, name="normal reference")
 fig.show()
 
 
 ## QQ plot
 fig = go.Figure()
-ref = sp.stats.norm.rvs(mu, sig, N)
+ref = sp.stats.norm.rvs(mu, np.sqrt(sig), N)
 fig.add_scatter(x=sorted(ref), y=sorted(dists), name="Dist")
 fig.update_layout(title={"text":"QQPlot"})
 fig.add_scatter(x=[min(ref), max(ref)], y=[min(ref), max(ref)], name="reference")
 fig.show()
 
+
+ce.store_new_data((mu, sig), w, h, n)
     
             
             

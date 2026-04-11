@@ -4,25 +4,9 @@ import numpy as np
 import scipy as sp
 import os
 
-pickle_path = "CE-ECDF_data.pkl"
+pickle_path = "CE_Normals.pkl"
 
-def single_experiment():
-    # generate a soup
-    soup = Soup.Soup(w,h,n)
-    soup.update_q_tree()
-    
-    def find_nearest(p, search_dist=50):
-        neighbors = soup.get_neighbors(p.pos, search_dist) #only take the top one
-        
-        #increase search area if needed
-        if len(neighbors) == 0:
-            return find_nearest(p, search_dist*2)
-        
-        dists = [np.linalg.norm(p.pos - pn) for pn in neighbors]
-        return min(dists)
-    
-    dists = [find_nearest(p) for p in soup.particles]
-    return sum(dists)/len(dists)
+
 
 class ClarkEvensUtil:
     def __init__(self, w, h, n):
@@ -49,16 +33,40 @@ class ClarkEvensUtil:
         #we will reread this file each time it loads so that it doesnt store unneccesarry data
         
         if self.args not in pk_data:
-            raise KeyError(f"No ECDF data found for parameters: {self.args}")
+            raise KeyError(f"No dist found for parameters: {self.args}")
         
         self.data = pk_data[self.args]
         
-        if not isinstance(self.data, list):
-            raise TypeError(f"ECDF not stored as a list. {type(self.data)}")
+        if not isinstance(self.data, tuple):
+            raise TypeError(f"Dist params not stored as a list. {type(self.data)}")
        
     def pval(self, observed):
-        frac_below = np.searchsorted(self.data, observed, side='right') / len(self.data)
-        return 2 * min(frac_below, 1 - frac_below) 
+        z = (observed - self.data[0])/self.data[1] #standardize the distribution
+        p = sp.stats.norm.cdf(z)
+        return min(p, 1-p)
+    
+    def test(self, soup):
+        soup.update_q_tree()
+        
+        def find_nearest(p, search_dist=50):
+            neighbors = soup.get_neighbors(p.pos, search_dist)[1]
+            all_neighbors = []
+            for sub_n in neighbors:
+                if len(sub_n) > 0: all_neighbors.extend(sub_n)
+            
+            
+            #increase search area if needed
+            if len(neighbors) == 0:
+                return find_nearest(p, search_dist*2)
+            
+            dists = [np.linalg.norm(p.pos - pn) for pn in all_neighbors if not np.allclose(p.pos, pn)]
+            return min(dists)
+    
+        dists = [find_nearest(p) for p in soup.particles]
+        X = sum(dists)/len(dists) #test statistic
+        
+        return self.pval(X)
+        
         
 def store_new_data(data, w, h, n):
     args = (w, h, n)

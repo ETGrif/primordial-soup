@@ -3,6 +3,7 @@ from numpy.random import rand
 from Particle import Particle
 import pyqtree as pyqt
 from astropy.stats import kuiper
+import ClarkEvansUtil
 
 
                 
@@ -18,6 +19,7 @@ class Soup:
         self.class_dist = class_dist
         self.max_perception_distance = max(w/4, h/4) # TODO this should be dynamic, but for now static
         self.phenotypes = []
+        self.ceUtil = ClarkEvansUtil.ClarkEvensUtil(w, h, n)
         
         #Populate with class_dist. If presesnt, use premade phenotypes, othewise generate randomly.
         
@@ -121,7 +123,7 @@ class Soup:
 # -=-=-=-=-=-=-
 
     # returns the direction of movement from each particle, n_bins is the number of bins to return
-    def get_directions(self, n_bins, lag=0):
+    def get_directions(self, n_bins=1, lag=0):
         binned_thetas = np.zeros(n_bins)
         raw_thetas=[]
         dt = 2*np.pi / n_bins
@@ -138,10 +140,14 @@ class Soup:
         return binned_thetas, raw_thetas
     
     
-    def kuipers_test(self, raw):
+    def kuipers_test(self, raw=None, lag=0):
+        if raw == None: _, raw = self.get_directions(lag = 0)
         raw =np.array(raw)/(2*np.pi) + .5 #astropy kuiper's requires data in [0,1]
         _, p_val = kuiper(raw)
         return p_val
+    
+    def clark_evans_test(self):
+        return self.ceUtil.test(self) #just pass it over to the CE Util
             
             
             

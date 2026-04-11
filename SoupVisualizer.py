@@ -49,6 +49,7 @@ def animate(root, canvas, soup, fps=24, trail_length=None, stat_pane=None, stat_
             hist, raw = soup.get_directions(n_bins, lag=14)
             p = soup.kuipers_test(raw)
             sv.update_histogram(stat_pane, hist, p)
+            print(soup.clark_evans_test())
         
         root.update()
         elapsed = time.time() - start
