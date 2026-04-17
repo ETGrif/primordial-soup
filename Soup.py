@@ -1,4 +1,5 @@
 import numpy as np
+import scipy as sp
 from numpy.random import rand
 from Particle import Particle
 import pyqtree as pyqt
@@ -19,7 +20,11 @@ class Soup:
         self.class_dist = class_dist
         self.max_perception_distance = max(w/4, h/4) # TODO this should be dynamic, but for now static
         self.phenotypes = []
-        self.ceUtil = ClarkEvansUtil.ClarkEvensUtil(w, h, n)
+        
+        #stat tests
+        self.ceUtil = ClarkEvansUtil.ClarkEvensUtil(w, h, n) #this is the util that can run CE tests
+        self.fvec = np.array([0.0,0.0]) #this vector will hold the Fisher stat for both tests
+        self.tests_run = 0 #holds onto the number of tests run, gives us distribution of the fvec
         
         #Populate with class_dist. If presesnt, use premade phenotypes, othewise generate randomly.
         
@@ -121,6 +126,20 @@ class Soup:
 # -=-=-=-=-=-=-
 # STATS SECTION
 # -=-=-=-=-=-=-
+
+    def stats_update(self):
+        kuiper_p = self.kuipers_test(lag=14)
+        clark_p, _ = self.clark_evans_test()
+        
+        #Fishers method for combining p-vals
+        self.fvec -= 2*np.log(np.array([kuiper_p, clark_p]))  #this is distributed as a Chi^2 with 2k dof (k = tests_run)
+        self.tests_run += 1
+        
+    def p_vec(self):
+        p1 = sp.stats.chi2.cdf(self.fvec[0], 2*self.tests_run)
+        p2 = sp.stats.chi2.cdf(self.fvec[1], 2*self.tests_run)
+        return (min(p1, 1-p1), min(p2, 1-p2))
+
 
     # returns the direction of movement from each particle, n_bins is the number of bins to return
     def get_directions(self, n_bins=1, lag=0):

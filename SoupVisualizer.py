@@ -25,7 +25,7 @@ def initialize(canvas, soup, r=3, trails=False):
         if trails:
             p.trail_ref = canvas.create_line(list(p.history), fill=colors[cid])
         
-def animate(root, canvas, soup, fps=24, trail_length=None, stat_pane=None, stat_sec=1):
+def animate(root, canvas, soup, fps=24, trail_length=None, stat_pane=None, stat_sec=2):
     frame = 0
     update_stat = fps*stat_sec
     if stat_pane is not None: n_bins = len(stat_pane.data["arc_ids"])
@@ -47,9 +47,13 @@ def animate(root, canvas, soup, fps=24, trail_length=None, stat_pane=None, stat_
             
         if  stat_pane is not None and frame%update_stat == 0:
             hist, raw = soup.get_directions(n_bins, lag=14)
-            p = soup.kuipers_test(raw)
-            sv.update_histogram(stat_pane, hist, p)
-            print(soup.clark_evans_test())
+            
+            soup.stats_update()
+            (p1, p2) = soup.p_vec()
+            
+            sv.update_histogram(stat_pane, hist, p1)
+            print(f"Kuipers: {p1}")
+            print(f"Clark-Evans {p2}")
         
         root.update()
         elapsed = time.time() - start

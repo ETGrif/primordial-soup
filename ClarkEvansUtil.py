@@ -41,12 +41,13 @@ class ClarkEvensUtil:
             raise TypeError(f"Dist params not stored as a list. {type(self.data)}")
        
     def pval(self, observed):
-        z = (observed - self.data[0])/self.data[1] #standardize the distribution
+        z = (observed - self.data[0])/np.sqrt(self.data[1]) #standardize the distribution
         p = sp.stats.norm.cdf(z)
         return min(p, 1-p)
     
-    def test(self, soup):
-        soup.update_q_tree()
+    #update tells us whether or not the qtree might need to be updates
+    def test(self, soup, qt_update=True):
+        if qt_update: soup.update_q_tree()
         
         def find_nearest(p, search_dist=50):
             neighbors = soup.get_neighbors(p.pos, search_dist)[1]
@@ -56,7 +57,7 @@ class ClarkEvensUtil:
             
             
             #increase search area if needed
-            if len(neighbors) == 0:
+            if len(all_neighbors) == 1:
                 return find_nearest(p, search_dist*2)
             
             dists = [np.linalg.norm(p.pos - pn) for pn in all_neighbors if not np.allclose(p.pos, pn)]
@@ -65,7 +66,7 @@ class ClarkEvensUtil:
         dists = [find_nearest(p) for p in soup.particles]
         X = sum(dists)/len(dists) #test statistic
         
-        return self.pval(X)
+        return self.pval(X), X
         
         
 def store_new_data(data, w, h, n):
