@@ -12,6 +12,8 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 
 \title{A Beginner's Guide to Emergent Behavior Design/Discovery}
 \author{Et Griffin}
@@ -24,36 +26,126 @@ Your abstract.
 \end{abstract}
 
 \section{Introduction}
-Emergent Behavior is concerned with the complex behaviors that arise from the interaction
-of sytems within a larger system. Holland defines a system generally as "any interacting or 
-independent group of entities that forms a unified and purposeful whole" \cite{RealWorld}.
-For the purposes of this guide, it is useful to define a system as an autonomous object with
-a set of mechanisms that take an input and create some output, inteligently or otherwise,
-to achieve goal behaviors. Mechanisms allow a system to funciton as a means to some goal,
-defining system level behavior. A system of systems (SoS) is a higher level system comprised of 
-a collection of lower level systems. An SoS is a system, so it takes input, has its own mechanisms,
-and provides output. The difference is that an SoS can define mechanisms in terms of lower level systems.
-The interaction of the behaviors of lower level systems within the SoS is capable of creating
-behavior more complex than any individual part could achieve.\\
+Emergent Behavior is concerned with the complex behaviors that arise from the interaction of sytems within a larger system. Holland defines a system generally as "any interacting or  independent group of entities that forms a unified and purposeful whole" \cite{RealWorld}.
+For the purposes of this guide, it is useful to define a system as an autonomous object with a set of mechanisms that take an input and create some output, inteligently or otherwise, to achieve goal behaviors. 
+Mechanisms allow a system to funciton as a means to some goal, defining system level behavior. A system of systems (SoS) is a higher level system comprised of a collection of lower level systems. An SoS is a system, so it takes input, has its own mechanisms, and provides output. The difference is that an SoS can define mechanisms in terms of lower level systems.
+The interaction of the behaviors of lower level systems within the SoS is capable of creating behavior more complex than any individual part could achieve.\\
 Systems of Systems naturally fit into a heigerarchical structure and the practice of reductionism. 
 The classic example is matter.
-Mass is a thing in physical space that has some properties: maybe the mass is a book that is solid,
-or a gas that is fluid. The behavioral features of the mass are not inherent, but a symptom of the interaction
-of smaller reduced parts--molecules. The mass is the interaction of
-a set of molecules, and this interaction provides the mass with it's behavioral features. Of course the molecules' behaviors
-are also not inherent, but caused by the atoms that make it up. The atoms are made of elementary particles,
-and so on. In this way, the layers build--each creating more complex behvaior unitl the highest level of complexity
-being considered is defined.\\
-\\
+Mass is a thing in physical space that has some properties: maybe the mass is a book that is solid, or a gas that is fluid. The behavioral features of the mass are not inherent, but a symptom of the interaction of smaller reduced parts--molecules. 
+The mass is the interaction of a set of molecules, and this interaction provides the mass with it's behavioral features. Of course the molecules' behaviors are also not inherent, but caused by the atoms that make it up. 
+The atoms are made of elementary particles, and so on. In this way, the layers build--each creating more complex behvaior unitl the highest level of complexity being considered is defined.
 
 
 \section{The Discovery / Design Workflow}
+[Outline the process we're about to go through.]\\
+\\
+The process of discovering or designing emergence in a system is a simple but long process. 
+The key idea to hold onto is that emergence comes from the interaction between of low level mecahnisms through a higher level system. The mechanisms directly cause the behaviors. So the fundamental objects we will consider are the mechanisms and the behaviors they cause. We will make hypotheses about these fundamental objects and follow the trail to a conclusion about the system under consideration. \\
+Suppose we wish to design a SoS with a certain emergent behavior in mind. Then we can hypothesize a "pool" of mechanisms that are plausible to cause such behavior. Then we can search this pool for the set (or sets) of mechanisms that cause the emergent behavior within a simulation.
+Likewise, suppose we have a given set of mechanisms and wish to discover what kind of what emergent behaviors are possible under these mechanisms. We can hypothesize the "pool" of plausible emergent behvaiors and see if any occur in a simulation.
+\\
+In this way we can hypothesize about either end of the cause and effect chain for emergent behavior. We could also play around with hypotheses about both causes and effects at the same time, a more generalized form of emergent discovery.\\
+For this guide, we are following this more general form of discovery, and
+will be following these steps:\\
+\begin{enumerate}
+\item \textbf{Domain Hypothesis}: Hypothesize and model plausible mechanisms.
+\item \textbf{Behvaioral Testing}: Hypothesize and test plausible behvaviors. (Only do one if designing.)
+\item \textbf{Exploration}: Use an optimization method to find mechanism-behavior pairs within the parameter space passing behavioral tests during simulation.
+\item \textbf{Understanding}: Reverse engineer the results to come to a model of why the emergence appears.
+\end{enumerate}
+Through this process we can discover (or design) emergent behaviors for any system we can feasibly model. For this guide, we propose a system in which emergence is likely to occur. Taking inspiration from [Go back and find all those videos, and papers. Attribution!], we aim to model a pseudo representaition of the primordial soup. Partcles in a space are capable of interacting with one another through forces and could combine to create complex "lifeforms." For simplicity, we do not aim to make a physically accurate model, since our main goal is to show the process of emergent discovery, not to discover emergence within the system of physical reality.
 
+
+\section{Domain Hypothesis}
 \subsection{Overview}
+Domain Hypothesis about defining a set of plausible mechanisms within a system that might be capable of creating an emergent behvaior. We hope to find any and all possible mechanisms, so its helpful to introduce parameterizations to each fundamental mechanism to create a family of potential mechanisms to use. Then each possible mechanism set is a vector within a parameter space. This vector is called the \textit{phenotype} of the particle.
+
+\subsection{Modeling}
+We aim to model the forces governing a set of particles in a space. To encourage emergent behavior we will remove the requirement for forces to be symmetric, and we will be modeling movement without accelleration or mass. Then we are not modeling forces but what we will refer to as "urges" for movement. A particle $i$ at position $\vec{x}_i$ will then move in the direction of the sum of all it's urges, $\vec{u}_i$ for the next timestep (\ref{eq:movement}). Each urge, then, is a mechanism for movement of each particle.\\
+The basic types of urges we are considering are Brownian ($\vec{g}$), directional bias ($\vec{b}$), and nuclear-like ($\vec{n}$) urges. To allow for a variety of possible interactions between mechanisms, each urge is parameterized. The vector $\vec{\theta}_i$ is called the phenotype, and holds parameters for all urges.
+
+\begin{equation}
+    \label{eq:movement}
+    \vec{x}^{(t+1)}_i= \vec{x}^{(t)}_i + \vec{u}^{(t+1)}_i
+\end{equation}
+\begin{equation}
+    \vec{u}^{(t+1)}_i = \vec{g}^{(t)}(\vec{\theta}_i) + \vec{b}(\vec{x}^{(t+1)}_i -\vec{x}^{(t)}_i,\vec{\theta}_i) + \sum_{j \neq i}\vec{n}(\vec{x}_j, \vec{\theta}_i)
+\end{equation}
+
+The Brownian urge, is a graussian random vector, scaled by $\theta_1$.
+\begin{equation}
+    \vec{g}^{(t)}(\vec{\theta}) \sim \theta_1\begin{bmatrix} N(0,1)\\ N(0,1)\end{bmatrix}
+\end{equation}
+
+The directional bias urge is a vector pointing an angle $\theta_3$ counter-clockwise from the present velocity of the particle, scaled to a prescribed length, $\theta_2$.
+\begin{equation}
+    \vec{b}(\vec{v}, \vec{\theta}) = \theta_2 
+    \begin{bmatrix}
+        \cos\theta_3 & -\sin\theta_3\\
+        \sin\theta_3 & \cos\theta_3
+    \end{bmatrix} \hat{v}
+    \text{, where }
+    \hat{v}= \frac{\vec{v}}{||\vec{v}||}
+\end{equation}
+
+Both the Brownian and the directional bias urges are autonomous urges, and do not have any affect on other particles in the higher system. The nuclear-like urges communicate information (specifically particle position) through the higher level system, the macro-scale environemnt. The nuclear-like urge for a particle $i$ based on a particle $j$ is based on the distance between the two particles. As the name suggests, this urge is based on the nulcear forces. There is a strong repulsive urge for particles that are too close together, and either an attractive or repulsive urge for particles that are further away but still close. This urge is dependent on prescribed distance thresholds, which are part of the phenotype, and the amplitude (and sign) of the second component. These thresholds will be determined by the $\phi_1$, $\phi_2$, and $\phi_3$, with $\phi_4$ being the amplitude. The magnitude of the force is given by $\eta(r, \vec{\phi})$, shown here (\ref{eq:nuclear-like_magnitude}) and an instance in Fig \ref{fig:nuclear-like_magnitude}.
+\begin{equation}
+    \label{eq:nuclear-like_magnitude}
+    \eta(r, \vec{\phi}) = \begin{cases}
+    \frac{-(r-\phi_1)^2}{r}             ,& r\leq\phi_1\\
+    \frac{\phi_4}{\phi_2}(x-\phi_1) ,& \phi_1 < r \leq \phi_1 + \phi_2\\
+    \frac{-\phi_4}{\phi_3}(r -\phi_1 -\phi_2 - \phi_3) ,& \phi_1 + \phi_2 < r \leq \phi_1 + \phi_2 + \phi_3\\
+    0 ,& \text{else}
+    \end{cases}
+\end{equation}
 
 
-\section{Mechanisms}
-\subsection{Domain Hypothesis}
+% ── Parameters ──────────────────────────────────────
+\pgfmathsetmacro{\phiOne}{2}
+\pgfmathsetmacro{\phiTwo}{1}
+\pgfmathsetmacro{\phiThree}{3}
+\pgfmathsetmacro{\phiFour}{1}
+% ────────────────────────────────────────────────────
+
+% Derived breakpoints
+\pgfmathsetmacro{\brkA}{\phiOne}
+\pgfmathsetmacro{\brkB}{\phiOne + \phiTwo}
+\pgfmathsetmacro{\brkC}{\phiOne + \phiTwo + \phiThree}
+\pgfmathsetmacro{\xmax}{\brkC + 1.5}
+
+\begin{figure}[h]
+\centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xlabel={$r$},
+            ylabel={$\eta(r,\,\vec{\phi})$},
+            samples=400,
+            thick,
+            axis lines=left,
+            grid=major,
+            grid style={dashed, gray!30},
+            xmin=0, xmax=\xmax,
+            ymin=-1, ymax=2,       % ← adjust to taste
+            clip=true,
+            ]
+            
+            \addplot[blue, domain=0.15:\brkA]   {-(x-\phiOne)^2 / x};
+            \addplot[blue, domain=\brkA:\brkB]  {(\phiFour/\phiTwo)*(x - \phiOne)};
+            \addplot[blue, domain=\brkB:\brkC]  {(-\phiFour/\phiThree)*(x - \phiOne - \phiTwo - \phiThree)};
+            \addplot[blue, domain=\brkC:\xmax]  {0};
+            
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Nuclear-like magnitude for $\vec{\phi} = [2,1,3,1]$}
+    \label{fig:nuclear-like_magnitude}
+\end{figure}
+
+
+    
+
+\subsection{Example of simple emergence under this model}
+[Show off the simple worm example]
 
 \section{Behaviors -- Behavioral Testing}
 

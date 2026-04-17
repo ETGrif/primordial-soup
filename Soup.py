@@ -1,13 +1,16 @@
 import numpy as np
+import scipy as sp
 from numpy.random import rand
 from Particle import Particle
 import pyqtree as pyqt
+from astropy.stats import kuiper
+import ClarkEvansUtil
 
 
                 
 class Soup:
     
-    phenotypes = []
+    
     
     # defined width, heighth and number of randomlme generated particles
     def __init__(self, w, h, n, class_dist=[1], phenotypes=None):
@@ -16,7 +19,12 @@ class Soup:
         self.h = h
         self.class_dist = class_dist
         self.max_perception_distance = max(w/4, h/4) # TODO this should be dynamic, but for now static
-    
+        self.phenotypes = []
+        
+        #stat tests
+        self.ceUtil = ClarkEvansUtil.ClarkEvensUtil(w, h, n) #this is the util that can run CE tests
+        self.fvec = np.array([0.0,0.0]) #this vector will hold the Fisher stat for both tests
+        self.tests_run = 0 #holds onto the number of tests run, gives us distribution of the fvec
         
         #Populate with class_dist. If presesnt, use premade phenotypes, othewise generate randomly.
         
@@ -114,3 +122,51 @@ class Soup:
             
             
             return p
+        
+# -=-=-=-=-=-=-
+# STATS SECTION
+# -=-=-=-=-=-=-
+
+    def stats_update(self):
+        kuiper_p = self.kuipers_test(lag=14)
+        clark_p, _ = self.clark_evans_test()
+        
+        #Fishers method for combining p-vals
+        self.fvec -= 2*np.log(np.array([kuiper_p, clark_p]))  #this is distributed as a Chi^2 with 2k dof (k = tests_run)
+        self.tests_run += 1
+        
+    def p_vec(self):
+        p1 = sp.stats.chi2.cdf(self.fvec[0], 2*self.tests_run)
+        p2 = sp.stats.chi2.cdf(self.fvec[1], 2*self.tests_run)
+        return (min(p1, 1-p1), min(p2, 1-p2))
+
+
+    # returns the direction of movement from each particle, n_bins is the number of bins to return
+    def get_directions(self, n_bins=1, lag=0):
+        binned_thetas = np.zeros(n_bins)
+        raw_thetas=[]
+        dt = 2*np.pi / n_bins
+        for p in self.particles:
+            if p.wrapped_this_frame: continue
+            if len(p.history) < 2*lag +1: 
+                continue
+            
+            dx = p.pos[0] - p.history[2*lag]
+            dy = p.pos[1] - p.history[2*lag +1]
+            theta = np.arctan2(dy, dx) #find the angle
+            raw_thetas.append(theta) #record raw theta
+            binned_thetas[round(theta/dt)] += 1  #increment the bin its in
+        return binned_thetas, raw_thetas
+    
+    
+    def kuipers_test(self, raw=None, lag=0):
+        if raw == None: _, raw = self.get_directions(lag = 0)
+        raw =np.array(raw)/(2*np.pi) + .5 #astropy kuiper's requires data in [0,1]
+        _, p_val = kuiper(raw)
+        return p_val
+    
+    def clark_evans_test(self):
+        return self.ceUtil.test(self) #just pass it over to the CE Util
+            
+            
+            

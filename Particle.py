@@ -1,15 +1,20 @@
 import numpy as np
+from collections import deque
 
 """
 A Particle takes in 
 """
 class Particle:
-    def __init__(self, x, y, soup, phenotype):
+    def __init__(self, x, y, soup, phenotype, history_len=15):
         self.pos = np.array([x,y])
-        self.v = np.array([1,0]) #just to initialize. NOT ZERO for inverse norm reasons
+        self.v = np.random.rand(2) #just to initialize. NOT ZERO for inverse norm reasons
+        self.v = self.v / np.linalg.norm(self.v)
         
         self.soup = soup
         self.phenotype = phenotype
+        self.history = deque(maxlen=history_len*2)
+        self.history.extend(self.pos)
+        self.history.extend(self.pos) # push a second copy for warmup
         
         
         
@@ -17,6 +22,7 @@ class Particle:
         #This function needs to make an update based on the X = n + g + b rules
         
         self.wrapped_this_frame = False
+        self.history.extend(self.pos)
         
         # Brownian motion
         t = self.phenotype["gaussian"]["theta"]
@@ -93,4 +99,10 @@ class Particle:
             y-= h
             self.wrapped_this_frame = True
         self.pos = np.array([x,y])
+        
+        #if wrapped this frame, then we want to clear the history (for bias purposes)
+        if self.wrapped_this_frame: 
+            self.history.clear()
+            self.history.extend(self.pos)
+            self.history.extend(self.pos)
         

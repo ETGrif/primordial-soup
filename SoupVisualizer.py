@@ -4,6 +4,7 @@ import tkinter as tk
 import numpy as np
 import time
 import Soup
+import StatsVisualizer as sv
 
 
 def build(w, h):
@@ -22,30 +23,39 @@ def initialize(canvas, soup, r=3, trails=False):
         
         # trails
         if trails:
-            p.history=[x, y]*2
-            p.trail_ref = canvas.create_line(p.history, fill=colors[cid])
+            p.trail_ref = canvas.create_line(list(p.history), fill=colors[cid])
         
-def animate(root, canvas, soup, fps=24, trail_length=None):
+def animate(root, canvas, soup, fps=24, trail_length=None, stat_pane=None, stat_sec=2):
+    frame = 0
+    update_stat = fps*stat_sec
+    if stat_pane is not None: n_bins = len(stat_pane.data["arc_ids"])
+    
     while True:
         start = time.time()
+        frame += 1
+        
         soup.sim_step()
+        
+        
         for p in soup.particles:
             # particle position
             canvas.moveto(p.animation_ref, p.pos[0]-p.r, p.pos[1]-p.r)
             
             # trails
             if trail_length:
-                if p.wrapped_this_frame:
-                    p.history = [p.pos[0], p.pos[1]]
-                p.history.extend(p.pos) #add on new coords
-                canvas.coords(p.trail_ref, p.history)
-                
-                #purge the end of the trail
-                if len(p.history) >trail_length:
-                    p.history.pop(0) #remove old coords
-                    p.history.pop(0)
+                canvas.coords(p.trail_ref, list(p.history))
             
-            root.update()
+        if  stat_pane is not None and frame%update_stat == 0:
+            hist, raw = soup.get_directions(n_bins, lag=14)
+            
+            soup.stats_update()
+            (p1, p2) = soup.p_vec()
+            
+            sv.update_histogram(stat_pane, hist, p1)
+            print(f"Kuipers: {p1}")
+            print(f"Clark-Evans {p2}")
+        
+        root.update()
         elapsed = time.time() - start
         time.sleep(max(1/fps-elapsed, 0))
 

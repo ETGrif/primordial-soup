@@ -1,0 +1,93 @@
+import Soup
+import pickle
+import numpy as np
+import scipy as sp
+import os
+
+pickle_path = "CE_Normals.pkl"
+
+
+
+class ClarkEvensUtil:
+    def __init__(self, w, h, n):
+        self.path = pickle_path
+        self.args = (w, h, n)
+        self.load_data() #loads the file and stores the correct data
+        
+        
+
+    def load_pickle(self):
+        try:
+            with open(self.path, "rb") as fin:
+                data = pickle.load(fin)
+        except FileNotFoundError:
+            print(f"ClarkEvans file, {self.path}, not found")
+        
+        if not isinstance(data, dict):
+            raise TypeError("ClarkEvans Pickle file must contain a dictionary.")
+        
+        return data
+        
+    def load_data(self):
+        pk_data = self.load_pickle() 
+        #we will reread this file each time it loads so that it doesnt store unneccesarry data
+        
+        if self.args not in pk_data:
+            raise KeyError(f"No dist found for parameters: {self.args}")
+        
+        self.data = pk_data[self.args]
+        
+        if not isinstance(self.data, tuple):
+            raise TypeError(f"Dist params not stored as a list. {type(self.data)}")
+       
+    def pval(self, observed):
+        z = (observed - self.data[0])/np.sqrt(self.data[1]) #standardize the distribution
+        p = sp.stats.norm.cdf(z)
+        return min(p, 1-p)
+    
+    #update tells us whether or not the qtree might need to be updates
+    def test(self, soup, qt_update=True):
+        if qt_update: soup.update_q_tree()
+        
+        def find_nearest(p, search_dist=50):
+            neighbors = soup.get_neighbors(p.pos, search_dist)[1]
+            all_neighbors = []
+            for sub_n in neighbors:
+                if len(sub_n) > 0: all_neighbors.extend(sub_n)
+            
+            
+            #increase search area if needed
+            if len(all_neighbors) == 1:
+                return find_nearest(p, search_dist*2)
+            
+            dists = [np.linalg.norm(p.pos - pn) for pn in all_neighbors if not np.allclose(p.pos, pn)]
+            return min(dists)
+    
+        dists = [find_nearest(p) for p in soup.particles]
+        X = sum(dists)/len(dists) #test statistic
+        
+        return self.pval(X), X
+        
+        
+def store_new_data(data, w, h, n):
+    args = (w, h, n)
+    
+    # read fil if exists, create one otherwise
+    if os.path.exists(pickle_path):
+        with open(pickle_path, "rb") as fin:
+            all_data = pickle.load(fin)
+    else:
+        all_data = dict()
+        
+    # update the dataset
+    all_data[args] = data
+    
+    #write the data!
+    with open(pickle_path, "wb") as fout:
+        pickle.dump(all_data, fout)
+  
+    
+    
+        
+    
+    
